@@ -1,0 +1,22 @@
+{
+  "name": "buhgalterbot",
+  "version": "0.0.1",
+  "description": "Telegram bot for buhgalteria ",
+  "main": "app.js",
+  "scripts": {
+    "test": "nodemon app.js"
+  },
+  "keywords": [
+    "Telegram-bot",
+    "buhgalteria",
+    "web"
+  ],
+  "author": "Alex_Ku",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "mongoose": "^6.7.0",
+    "node-telegram-bot-api": "^0.59.0",
+    "nodemon": "^2.0.20"
+  }
+}

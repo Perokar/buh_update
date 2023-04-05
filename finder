@@ -1,0 +1,4 @@
+$group:{
+    _id: '$id',
+    summa: {$sum:'$debet'}
+}
