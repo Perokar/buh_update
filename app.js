@@ -1,6 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const mongoose = require('mongoose');
-const { saveDataUser, addCoin, findToday, earseCoins, findAllCoins, getDebet, getCredit, monthData } = require('./dataShems')
+const { saveDataUser, addCoin, findToday, earseCoins, findAllCoins, getDebet, getCredit, getMonth} = require('./dataShems')
 require('dotenv').config();
 const parametr = require('./message');
 const message = require('./message');
@@ -44,7 +44,7 @@ bot.on('message', async (msg) => {
         // return bot.sendMessage(msg.from.id, inDev);
     }
     if(msg.text==='/month'){
-        monthData(await msg.from.id,3);
+        bot.sendMessage(msg.from.id,message.Month,message.buttonsMonth);
         return false;
     }
     if (msg.text === '/rules') {
@@ -76,10 +76,6 @@ async function lightBuh(someText, id) {
             console.log("debet " + debet);
             break;
     }
-    // coins[0] === '-' ? credit = +coins : debet = +coins;
-    // if (coins[0]==='='){
-    //     return answerBot()
-    // }
     let description = someText.match(/[A-ZА-Яії ]+/gi) != null ? someText.match(/[A-ZА-Яії ]+/gi)[0] : (answerBot(parametr.Error2, id), 0);
     let newOrder = {
         'idUser': id,
@@ -99,12 +95,10 @@ async function lightBuh(someText, id) {
     }
 
 }
-function answerBot(message, id) {
-    return bot.sendMessage(id, message)
-}
 
 bot.on('callback_query', async (callback)=>{
     const isEmpty = val => val === null || !(Object.keys(val) || val).length;
+    // console.log(await +callback.data)
     switch (callback.data){
         case ('debet'): msgAnswer = await getDebet (await callback.from.id);
         break;
@@ -114,11 +108,51 @@ bot.on('callback_query', async (callback)=>{
         break;
         case ('creditToday'): msgAnswer = await getCredit (await callback.from.id,"today")
         break;
+        case ("0"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("1"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("2"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("3"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("4"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("5"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("6"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("7"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("8"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("9"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("10"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
+        case ("11"): 
+        msgAnswer = await getMonth(callback.from.id,await +callback.data);
+        break;
     }
-    if (isEmpty(msgAnswer)){
-        return answerBot(parametr.Error4, await callback.from.id)
-    }  
-    else{
-        return answerBot(msgAnswer, await callback.from.id)
-    }
+        if (msgAnswer!=false&&(await +callback.data&& await +callback.data)){
+            return answerBot(msgAnswer, await callback.from.id, message.buttonsM);
+        }
+        else if (msgAnswer===false){
+            return answerBot(message.Error4, await callback.from.id);
+        }
 });
+// Функції 
+function answerBot(message, id, buttons) {
+    return bot.sendMessage(id, message,buttons);
+}
