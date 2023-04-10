@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const monthNumber =[0,1,2,3,4,5,6,7,8,9,10,11];
+// Схема для збеоеження користувача
 const userSchema = new mongoose.Schema({
     date: {
         type: Date,
@@ -10,7 +12,9 @@ const userSchema = new mongoose.Schema({
         default: 0
     }
 });
+// модель користувача
 const User = mongoose.model('User', userSchema);
+// Схема коштів
 const coinSchema = new mongoose.Schema({
     idUser: Number,
     debet: Number,
@@ -21,8 +25,8 @@ const coinSchema = new mongoose.Schema({
     timestamps: true
 });
 const coinModel = mongoose.model('Coins', coinSchema);
+//Запис руху в базу
 async function addCoin(dataCoin) {
-    console.log(dataCoin)
     if (await User.findOne({
             id: dataCoin.idUser
         }) != null) {
@@ -43,7 +47,7 @@ async function findToday(userId) {
         idUser: userId
     })
     console.log(startDay + '\n' + today + '\n');
-    let data = await coinModel.aggregate([{
+    let [data] = await coinModel.aggregate([{
             $match: {
                 $and: [{
                         idUser: userId
@@ -69,10 +73,10 @@ async function findToday(userId) {
             }
         }
     ]);
-    return data[0]
+
+    return data;
 }
 async function getMonth(userId, month) {
-    console.log(month)
     const nDate = new Date();
     const fDay = new Date(nDate.getFullYear(), month, 1);
     const lDay = new Date(nDate.getFullYear(), month + 1, 0);
@@ -143,10 +147,12 @@ async function saveDataUser(userData) {
         console.log('User already excist')
     }
 }
+// Функція отримання дебету детально
 async function getDebet(id, timer) {
     let text = arrayCoin = '';
+    
     if (timer === 'today') {
-        let startDay = new Date().setHours(0, 0, 0, 1)
+        let startDay = new Date().setHours(0, 0, 0, 1);
         let today = Date.now();
         arrayCoin = await coinModel.find({
             idUser: id,
@@ -176,7 +182,10 @@ async function getDebet(id, timer) {
     }
     return text = text.slice(0, (text.length - 1))
 }
+//Функція отримання кредиту детально
 async function getCredit(id, timer) {
+    console.log(timer)
+    // Фільтровка за день 
     let text2 = arrayCoin = '';
     if (timer === 'today') {
         let startDay = new Date().setHours(0, 0, 0, 1)
@@ -192,7 +201,28 @@ async function getCredit(id, timer) {
             "description": 1,
             "_id": 0
         })
-    } else {
+    } 
+    // Фільтровка за місяць
+    else if(monthNumber.includes(+timer)){
+        console.log(+timer)
+        const nDate = new Date();
+        const fDay = new Date(nDate.getFullYear(), +timer, 1);
+        const lDay = new Date(nDate.getFullYear(), +timer + 1, 0);
+        arrayCoin = await coinModel.find({
+            idUser: id,
+            date: {
+                $gte: fDay,
+                $lte: lDay
+            }
+        }).select({
+            "credit": 1,
+            "description": 1,
+            "_id": 0
+        });
+    }
+    // Фільтровка за весь час
+    else {
+        console.log("all")
         arrayCoin = await coinModel.find({
             idUser: id
         }).select({
@@ -201,6 +231,7 @@ async function getCredit(id, timer) {
             "_id": 0
         })
     }
+    // Формування строки виводу
     for (let key of arrayCoin) {
         if (key != undefined && key.credit != 0) {
             text2 += `${key.credit}-->${key.description}\n`
